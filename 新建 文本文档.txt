@@ -1,0 +1,194 @@
+👉 三层智能系统架构
+
+┌────────────────────────────┐
+│        前端控制台 UI        │
+│ 任务 / 仿真 / 曲线 /日志     │
+└────────────┬───────────────┘
+             ↓
+┌────────────────────────────┐
+│       AI任务调度中心        │  ⭐升级点
+│ FastAPI + Redis Queue       │
+└────────────┬───────────────┘
+             ↓
+┌────────────────────────────┐
+│     具身智能执行层（核心）   │  ⭐升级点
+│ Gym / PyBullet / RL Agent   │
+└────────────┬───────────────┘
+             ↓
+┌────────────────────────────┐
+│ 数据层（MySQL + 爬虫 +缓存） │
+└────────────────────────────┘
+🧱 二、2.0新增4个“实习级核心模块”（重点）
+⭐ 模块1：任务队列系统（企业级加分）
+🔥 用 Redis + Worker
+✔ 架构
+
+API → Redis Queue → Worker → AI执行
+✔ 代码结构升级
+
+backend/
+ ├── worker/
+ │    ├── task_worker.py   ⭐新增
+ ├── queue/
+ │    ├── redis_queue.py   ⭐新增
+✔ Redis任务队列
+Python
+
+
+运行
+import redis
+
+r = redis.Redis()
+
+def push_task(task_id):
+    r.lpush("task_queue", task_id)
+
+def pop_task():
+    return r.rpop("task_queue")
+✔ Worker执行AI任务
+Python
+
+
+运行
+while True:
+    task_id = pop_task()
+    if task_id:
+        run_ai(task_id)
+👉 这个结构 = 企业后台任务系统
+
+⭐ 模块2：强化学习 Agent（升级重点🔥）
+你不再是“demo”，而是：
+
+🧠 RL Agent系统
+✔ Q-learning升级版
+Python
+
+
+运行
+import numpy as np
+
+class QAgent:
+    def __init__(self, states, actions):
+        self.q = np.zeros((states, actions))
+
+    def choose(self, s):
+        return np.argmax(self.q[s])
+
+    def update(self, s, a, r, ns):
+        self.q[s][a] += 0.1 * (r + np.max(self.q[ns]) - self.q[s][a])
+✔ 训练流程
+
+task → env.reset → agent step → reward → update Q-table
+⭐ 模块3：仿真环境升级（具身核心🔥）
+✔ Gym + PyBullet 双模式
+👉 环境抽象层
+Python
+
+
+运行
+class EnvFactory:
+    def create(self, type):
+        if type == "gym":
+            return gym.make("CartPole-v1")
+        if type == "robot":
+            return PyBulletEnv()
+✔ PyBullet机器人（升级版）
+Python
+
+
+运行
+import pybullet as p
+
+class RobotEnv:
+    def reset(self):
+        p.resetSimulation()
+        self.robot = p.loadURDF("robot.urdf")
+👉 这个模块 = “具身智能核心展示点”
+
+⭐ 模块4：实时训练可视化（面试杀手锏🔥）
+✔ Redis实时状态流
+
+reward → redis → frontend websocket
+✔ FastAPI WebSocket
+Python
+
+
+运行
+from fastapi import WebSocket
+
+@app.websocket("/ws")
+async def ws(websocket: WebSocket):
+    await websocket.accept()
+    while True:
+        data = redis.get("reward")
+        await websocket.send_json(data)
+✔ 前端实时曲线
+（ECharts）
+
+reward曲线
+
+step变化
+
+success rate
+
+🧱 三、2.0数据库升级设计（关键）
+✔ MySQL升级版结构
+1️⃣ tasks（增强）
+SQL
+
+id
+name
+env_type   -- gym / robot
+status
+reward
+created_at
+2️⃣ training_logs（新增🔥）
+SQL
+
+id
+task_id
+step
+action
+reward
+state
+3️⃣ dataset（爬虫数据）
+SQL
+
+id
+source
+type
+content
+🧱 四、2.0系统运行流程（面试必讲）
+
+① 用户创建任务
+        ↓
+② API写入MySQL + Redis队列
+        ↓
+③ Worker读取任务
+        ↓
+④ 初始化Gym / PyBullet环境
+        ↓
+⑤ Agent开始训练
+        ↓
+⑥ reward写入Redis
+        ↓
+⑦ WebSocket推送前端
+        ↓
+⑧ ECharts实时展示
+🧠 五、项目“高级感升级点”（非常重要）
+你现在这个版本已经可以写：
+
+⭐ 1. 支持多任务并行训练
+（Redis queue）
+
+⭐ 2. 支持多环境切换
+（Gym / Robot）
+
+⭐ 3. 实时训练可视化
+（WebSocket）
+
+⭐ 4. 可扩展AI Agent系统
+（Q-learning → PPO预留）
+
+⭐ 5. 数据驱动训练
+（爬虫 + dataset）
