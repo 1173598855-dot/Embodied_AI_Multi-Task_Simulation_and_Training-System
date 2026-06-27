@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div>
     <div style="display: flex; justify-content: space-between; margin-bottom: 16px">
       <h2>任务管理</h2>
@@ -21,7 +21,7 @@
           <el-button size="small" type="success" @click="startTask(row.id)" :disabled="row.status === 'running'">
             启动
           </el-button>
-          <el-button size="small" @click=".push(/training/)">监控</el-button>
+          <el-button size="small" @click="$router.push('/training/' + row.id)">监控</el-button>
           <el-popconfirm title="确认删除?" @confirm="deleteTask(row.id)">
             <template #reference>
               <el-button size="small" type="danger">删除</el-button>
@@ -60,7 +60,7 @@ async function loadTasks() {
 
 async function startTask(id) {
   try {
-    await api.post(/training//start)
+    await api.post('/training/' + id + '/start')
     ElMessage.success('任务已入队')
     loadTasks()
   } catch (e) {
@@ -70,7 +70,7 @@ async function startTask(id) {
 
 async function deleteTask(id) {
   try {
-    await api.delete(/tasks/)
+    await api.delete('/tasks/' + id)
     ElMessage.success('已删除')
     loadTasks()
   } catch (e) {

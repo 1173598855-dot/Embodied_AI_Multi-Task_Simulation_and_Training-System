@@ -1,8 +1,8 @@
-﻿<template>
+<template>
   <div>
     <h2>训练日志</h2>
     <el-select v-model="selectedTaskId" placeholder="选择任务" style="width: 240px; margin-bottom: 16px" @change="loadLogs">
-      <el-option v-for="t in tasks" :key="t.id" :label="${t.id} - " :value="t.id" />
+      <el-option v-for="t in tasks" :key="t.id" :label="t.id + ' - ' + t.name" :value="t.id" />
     </el-select>
 
     <el-table :data="logs" stripe style="width: 100%">
@@ -30,7 +30,7 @@ function formatTime(t) {
 
 async function loadLogs() {
   if (!selectedTaskId.value) return
-  const { data } = await api.get(/training//logs)
+  const { data } = await api.get('/training/' + selectedTaskId.value + '/logs')
   logs.value = data
 }
 

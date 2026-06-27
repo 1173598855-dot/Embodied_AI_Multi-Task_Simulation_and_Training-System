@@ -1,5 +1,5 @@
-﻿<template>
-  <el-dialog v-model="visible" title="创建训练任务" width="500px" @close="('close')">
+<template>
+  <el-dialog v-model="visible" title="创建训练任务" width="500px" @close="$emit('close')">
     <el-form :model="form" label-width="100px">
       <el-form-item label="任务名称">
         <el-input v-model="form.name" placeholder="如: CartPole 训练" />
@@ -24,7 +24,7 @@
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="('close')">取消</el-button>
+      <el-button @click="$emit('close')">取消</el-button>
       <el-button type="primary" @click="submit" :loading="loading">创建</el-button>
     </template>
   </el-dialog>

@@ -1,4 +1,4 @@
-﻿import { defineStore } from 'pinia'
+import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 export const useTrainingStore = defineStore('training', () => {
@@ -8,7 +8,7 @@ export const useTrainingStore = defineStore('training', () => {
 
   function connect(taskId) {
     const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const url = ${protocol}///ws/
+    const url = protocol + '//' + location.host + '/ws/' + taskId
     ws = new WebSocket(url)
 
     ws.onmessage = (event) => {

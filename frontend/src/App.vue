@@ -5,7 +5,7 @@
         AI 训练平台
       </div>
       <el-menu
-        :default-active=".path"
+        :default-active="$route.path"
         router
         background-color="#304156"
         text-color="#bfcbd9"
