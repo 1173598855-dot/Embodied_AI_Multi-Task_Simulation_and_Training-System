@@ -1,7 +1,10 @@
-﻿from sqlalchemy import Column, Integer, String, Float, Text, DateTime, ForeignKey, JSON
+from sqlalchemy import Column, Integer, String, Float, Text, DateTime, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+
+from core.task_state import VALID_STATUSES
 from db.database import Base
+
 
 class Task(Base):
     __tablename__ = "tasks"
@@ -16,6 +19,11 @@ class Task(Base):
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     logs = relationship("TrainingLog", back_populates="task", cascade="all, delete-orphan")
+
+    @staticmethod
+    def valid_statuses() -> set[str]:
+        return set(VALID_STATUSES)
+
 
 class TrainingLog(Base):
     __tablename__ = "training_logs"

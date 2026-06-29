@@ -1,5 +1,9 @@
-﻿from pydantic import BaseModel
 from datetime import datetime
+
+from pydantic import BaseModel
+
+from core.task_state import VALID_STATUSES
+
 
 class TaskCreate(BaseModel):
     name: str
@@ -7,6 +11,7 @@ class TaskCreate(BaseModel):
     env_name: str = "CartPole-v1"
     algo: str = "q_learning"
     config: dict | None = None
+
 
 class TaskResponse(BaseModel):
     id: int
@@ -20,6 +25,11 @@ class TaskResponse(BaseModel):
     created_at: datetime | None = None
     updated_at: datetime | None = None
     model_config = {"from_attributes": True}
+
+    @classmethod
+    def valid_statuses(cls) -> set[str]:
+        return set(VALID_STATUSES)
+
 
 class TrainingLogResponse(BaseModel):
     id: int

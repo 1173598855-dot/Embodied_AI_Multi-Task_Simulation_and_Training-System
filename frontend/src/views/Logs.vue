@@ -7,7 +7,9 @@
 
     <el-table :data="logs" stripe style="width: 100%">
       <el-table-column prop="episode" label="Episode" width="100" />
+      <el-table-column prop="step" label="Step" width="100" />
       <el-table-column prop="reward" label="Reward" width="120" />
+      <el-table-column prop="avg_reward" label="Avg Reward" width="120" />
       <el-table-column prop="created_at" label="时间">
         <template #default="{ row }">{{ formatTime(row.created_at) }}</template>
       </el-table-column>
@@ -17,7 +19,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import api from '../api/index.js'
+import { listTasks, getTrainingLogs } from '../api/index.js'
 
 const tasks = ref([])
 const logs = ref([])
@@ -30,12 +32,12 @@ function formatTime(t) {
 
 async function loadLogs() {
   if (!selectedTaskId.value) return
-  const { data } = await api.get('/training/' + selectedTaskId.value + '/logs')
+  const { data } = await getTrainingLogs(selectedTaskId.value)
   logs.value = data
 }
 
 onMounted(async () => {
-  const { data } = await api.get('/tasks')
+  const { data } = await listTasks()
   tasks.value = data
 })
 </script>

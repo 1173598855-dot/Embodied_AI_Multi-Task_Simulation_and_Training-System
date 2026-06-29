@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from api.deps import get_db, get_queue
+from api.deps import get_db
+from core.task_state import is_terminal_status
 from db.models import Task
 from db.schemas import TaskCreate, TaskResponse
-from worker.redis_queue import TaskQueue
 
 router = APIRouter()
 
@@ -42,5 +42,7 @@ def delete_task(task_id: int, db: Session = Depends(get_db)):
     task = db.query(Task).filter(Task.id == task_id).first()
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
+    if not is_terminal_status(task.status) and task.status != "pending":
+        raise HTTPException(status_code=400, detail=f"Task cannot be deleted from status {task.status}")
     db.delete(task)
     db.commit()

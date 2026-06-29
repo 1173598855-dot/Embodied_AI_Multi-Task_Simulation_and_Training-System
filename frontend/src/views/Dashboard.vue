@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div>
     <h2>仪表盘</h2>
     <el-row :gutter="20">
@@ -22,7 +22,7 @@
       </el-col>
       <el-col :span="6">
         <el-card shadow="hover">
-          <template #header>失败</template>
+          <template #header>失败/暂停</template>
           <div style="font-size: 32px; font-weight: bold; color: #f56c6c">{{ stats.failed }}</div>
         </el-card>
       </el-col>
@@ -32,17 +32,17 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import api from '../api/index.js'
+import { listTasks } from '../api/index.js'
 
 const stats = ref({ total: 0, running: 0, completed: 0, failed: 0 })
 
 onMounted(async () => {
   try {
-    const { data } = await api.get('/tasks')
+    const { data } = await listTasks()
     stats.value.total = data.length
-    stats.value.running = data.filter(t => t.status === 'running').length
-    stats.value.completed = data.filter(t => t.status === 'completed').length
-    stats.value.failed = data.filter(t => t.status === 'failed').length
+    stats.value.running = data.filter((t) => t.status === 'running').length
+    stats.value.completed = data.filter((t) => t.status === 'completed').length
+    stats.value.failed = data.filter((t) => ['failed', 'paused', 'canceled'].includes(t.status)).length
   } catch (e) {
     console.error('Failed to load stats', e)
   }

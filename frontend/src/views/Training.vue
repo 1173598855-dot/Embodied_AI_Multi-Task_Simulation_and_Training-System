@@ -1,11 +1,13 @@
-﻿<template>
+<template>
   <div>
-    <div style="display: flex; justify-content: space-between; margin-bottom: 16px">
-      <h2>训练监控 — 任务 #{{ taskId }}</h2>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center">
+      <h2>训练监控 - 任务 #{{ taskId }}</h2>
       <el-tag :type="statusType(store.taskStatus)" size="large">{{ store.taskStatus }}</el-tag>
     </div>
 
-    <el-empty v-if="store.rewardData.length === 0" description="等待训练数据..." />
+    <el-alert v-if="store.error" :title="store.error" type="error" show-icon style="margin-bottom: 16px" />
+    <el-skeleton v-if="store.loading" :rows="6" animated />
+    <el-empty v-else-if="store.rewardData.length === 0" description="等待训练数据..." />
 
     <template v-else>
       <el-card shadow="never" style="margin-bottom: 16px">
@@ -30,12 +32,13 @@ const store = useTrainingStore()
 const taskId = computed(() => route.params.id)
 
 function statusType(status) {
-  const map = { pending: 'info', running: '', completed: 'success', failed: 'danger' }
+  const map = { pending: 'info', running: '', completed: 'success', paused: 'warning', failed: 'danger', canceled: 'info' }
   return map[status] || 'info'
 }
 
-onMounted(() => {
+onMounted(async () => {
   store.clearData()
+  await store.loadHistory(taskId.value)
   store.connect(taskId.value)
 })
 
