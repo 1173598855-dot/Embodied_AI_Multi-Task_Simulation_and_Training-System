@@ -37,3 +37,12 @@ app.add_middleware(
 app.include_router(tasks.router, prefix="/api/tasks", tags=["tasks"])
 app.include_router(training.router, prefix="/api/training", tags=["training"])
 app.include_router(ws.router, tags=["websocket"])
+
+@app.get("/")
+def root():
+    return {
+        "name": "Embodied AI Training Platform",
+        "status": "ok",
+        "docs": "/docs",
+        "health": "/api/tasks",
+    }
