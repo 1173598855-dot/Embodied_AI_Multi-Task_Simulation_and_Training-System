@@ -4,7 +4,7 @@ from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.api.routes import health, root
+from app.api.routes import health, root, tasks, training, ws
 from app.core.errors import AppError
 
 
@@ -33,6 +33,9 @@ def create_app(extra_routers: Iterable[APIRouter] | None = None) -> FastAPI:
 
     application.include_router(root.router)
     application.include_router(health.router)
+    application.include_router(tasks.router)
+    application.include_router(training.router)
+    application.include_router(ws.router)
     for router in extra_routers or []:
         application.include_router(router)
     return application
