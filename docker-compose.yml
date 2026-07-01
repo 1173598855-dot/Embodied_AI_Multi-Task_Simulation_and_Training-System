@@ -1,4 +1,4 @@
-services:
+﻿services:
   mysql:
     image: mysql:8.0
     environment:
@@ -24,8 +24,9 @@ services:
       timeout: 5s
       retries: 10
 
-  backend:
+  backend-api:
     build: ./backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
     ports:
       - "18000:8000"
     depends_on:
@@ -36,6 +37,29 @@ services:
     environment:
       DATABASE_URL: ${DATABASE_URL:-mysql+pymysql://root:root123@mysql:3306/embodied_ai}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/live', timeout=3).read()"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend-worker:
+    build: ./backend
+    command: python -m app.worker.main
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-mysql+pymysql://root:root123@mysql:3306/embodied_ai}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+    healthcheck:
+      test: ["CMD", "python", "-c", "from app.worker.executor import WorkerExecutor; from app.infrastructure.redis.queue import TaskQueue; print('ok')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     restart: unless-stopped
 
   frontend:
@@ -43,7 +67,7 @@ services:
     ports:
       - "18080:80"
     depends_on:
-      - backend
+      - backend-api
     restart: unless-stopped
 
 volumes:
