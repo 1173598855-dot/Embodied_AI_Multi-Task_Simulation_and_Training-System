@@ -1,4 +1,4 @@
-﻿# Embodied AI Multi-Task Simulation & Training System
+# Embodied AI Multi-Task Simulation & Training System
 
 一个支持多任务并行训练的具身智能仿真平台，基于 FastAPI + Redis + MySQL + Vue 3 构建，并通过 WebSocket 提供实时训练可视化。
 
