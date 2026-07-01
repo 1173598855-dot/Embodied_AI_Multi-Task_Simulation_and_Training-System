@@ -1,9 +1,13 @@
-import axios from 'axios'
+﻿import axios from 'axios'
 
 const api = axios.create({
   baseURL: '/api',
   timeout: 10000,
 })
+
+export function getApiErrorMessage(error, fallback = '请求失败') {
+  return error.response?.data?.error?.message || error.response?.data?.detail || error.message || fallback
+}
 
 export function listTasks() {
   return api.get('/tasks')

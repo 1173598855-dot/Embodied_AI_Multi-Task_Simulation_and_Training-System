@@ -1,17 +1,17 @@
-<template>
+﻿<template>
   <el-dialog v-model="visible" title="创建训练任务" width="500px" @close="$emit('close')">
     <el-form :model="form" label-width="100px">
       <el-form-item label="任务名称">
-        <el-input v-model="form.name" placeholder="如: CartPole 训练" />
+        <el-input v-model="form.name" placeholder="例如：CartPole 训练" />
       </el-form-item>
       <el-form-item label="环境类型">
         <el-select v-model="form.env_type" style="width: 100%">
           <el-option label="Gym" value="gym" />
-          <el-option label="PyBullet (机器人)" value="robot" disabled />
+          <el-option label="PyBullet（机器人）" value="robot" disabled />
         </el-select>
       </el-form-item>
       <el-form-item label="环境名称">
-        <el-input v-model="form.env_name" placeholder="如: CartPole-v1" />
+        <el-input v-model="form.env_name" placeholder="例如：CartPole-v1" />
       </el-form-item>
       <el-form-item label="训练轮数">
         <el-input-number v-model="form.config.episodes" :min="10" :max="10000" />
@@ -32,7 +32,7 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
-import api from '../api/index.js'
+import { createTask, getApiErrorMessage } from '../api/index.js'
 import { ElMessage } from 'element-plus'
 
 const props = defineProps({ show: Boolean })
@@ -49,18 +49,18 @@ const form = reactive({
 })
 
 async function submit() {
-  if (!form.name) {
+  if (!form.name.trim()) {
     ElMessage.warning('请输入任务名称')
     return
   }
   loading.value = true
   try {
-    await api.post('/tasks', form)
+    await createTask(form)
     ElMessage.success('任务创建成功')
     emit('created')
     emit('close')
-  } catch (e) {
-    ElMessage.error('创建失败: ' + (e.response?.data?.detail || e.message))
+  } catch (error) {
+    ElMessage.error('创建失败：' + getApiErrorMessage(error))
   } finally {
     loading.value = false
   }

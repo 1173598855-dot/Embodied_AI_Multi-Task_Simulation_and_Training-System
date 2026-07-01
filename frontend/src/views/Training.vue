@@ -1,8 +1,8 @@
-<template>
+﻿<template>
   <div>
     <div style="display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center">
       <h2>训练监控 - 任务 #{{ taskId }}</h2>
-      <el-tag :type="statusType(store.taskStatus)" size="large">{{ store.taskStatus }}</el-tag>
+      <el-tag :type="statusType(store.taskStatus)" size="large">{{ statusLabel(store.taskStatus) }}</el-tag>
     </div>
 
     <el-alert v-if="store.error" :title="store.error" type="error" show-icon style="margin-bottom: 16px" />
@@ -31,8 +31,22 @@ const route = useRoute()
 const store = useTrainingStore()
 const taskId = computed(() => route.params.id)
 
+const statusLabels = {
+  created: '已创建',
+  queued: '排队中',
+  running: '运行中',
+  paused: '已暂停',
+  completed: '已完成',
+  failed: '失败',
+  canceled: '已取消',
+}
+
+function statusLabel(status) {
+  return statusLabels[status] || status
+}
+
 function statusType(status) {
-  const map = { pending: 'info', running: '', completed: 'success', paused: 'warning', failed: 'danger', canceled: 'info' }
+  const map = { created: 'info', queued: 'info', running: '', completed: 'success', paused: 'warning', failed: 'danger', canceled: 'info' }
   return map[status] || 'info'
 }
 

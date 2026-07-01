@@ -1,10 +1,10 @@
-import { defineStore } from 'pinia'
+﻿import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { getTrainingLogs } from '../api/index.js'
+import { getApiErrorMessage, getTrainingLogs } from '../api/index.js'
 
 export const useTrainingStore = defineStore('training', () => {
   const rewardData = ref([])
-  const taskStatus = ref('pending')
+  const taskStatus = ref('created')
   const loading = ref(false)
   const error = ref('')
   let ws = null
@@ -21,7 +21,7 @@ export const useTrainingStore = defineStore('training', () => {
         avgReward: item.avg_reward,
       }))
     } catch (err) {
-      error.value = err.response?.data?.detail || '加载历史数据失败'
+      error.value = getApiErrorMessage(err, '加载历史数据失败')
     } finally {
       loading.value = false
     }
@@ -35,14 +35,18 @@ export const useTrainingStore = defineStore('training', () => {
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data)
-      if (data.type === 'reward_update') {
+      if (data.type === 'episode_completed' || data.type === 'reward_update') {
         rewardData.value.push({
           episode: data.episode,
           reward: data.reward,
           epsilon: data.epsilon,
+          avgReward: data.avg_reward ?? data.avgReward,
         })
-      } else if (data.type === 'status_change') {
+      } else if (data.type === 'status_changed' || data.type === 'status_change') {
         taskStatus.value = data.status
+      } else if (data.type === 'task_failed') {
+        taskStatus.value = 'failed'
+        error.value = data.error || '训练任务失败'
       }
     }
 
@@ -64,7 +68,7 @@ export const useTrainingStore = defineStore('training', () => {
 
   function clearData() {
     rewardData.value = []
-    taskStatus.value = 'pending'
+    taskStatus.value = 'created'
     error.value = ''
   }
 

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <h2>仪表盘</h2>
     <el-row :gutter="20">
@@ -22,8 +22,8 @@
       </el-col>
       <el-col :span="6">
         <el-card shadow="hover">
-          <template #header>失败/暂停</template>
-          <div style="font-size: 32px; font-weight: bold; color: #f56c6c">{{ stats.failed }}</div>
+          <template #header>异常/暂停</template>
+          <div style="font-size: 32px; font-weight: bold; color: #f56c6c">{{ stats.problematic }}</div>
         </el-card>
       </el-col>
     </el-row>
@@ -32,19 +32,19 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { listTasks } from '../api/index.js'
+import { getApiErrorMessage, listTasks } from '../api/index.js'
 
-const stats = ref({ total: 0, running: 0, completed: 0, failed: 0 })
+const stats = ref({ total: 0, running: 0, completed: 0, problematic: 0 })
 
 onMounted(async () => {
   try {
     const { data } = await listTasks()
     stats.value.total = data.length
-    stats.value.running = data.filter((t) => t.status === 'running').length
-    stats.value.completed = data.filter((t) => t.status === 'completed').length
-    stats.value.failed = data.filter((t) => ['failed', 'paused', 'canceled'].includes(t.status)).length
-  } catch (e) {
-    console.error('Failed to load stats', e)
+    stats.value.running = data.filter((task) => ['queued', 'running'].includes(task.status)).length
+    stats.value.completed = data.filter((task) => task.status === 'completed').length
+    stats.value.problematic = data.filter((task) => ['failed', 'paused', 'canceled'].includes(task.status)).length
+  } catch (error) {
+    console.error(getApiErrorMessage(error, '加载统计失败'))
   }
 })
 </script>
