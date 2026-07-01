@@ -9,4 +9,4 @@ gymnasium==1.0.0
 numpy==2.2.1
 websockets==14.1
 python-dotenv==1.0.1
-cryptography>=44.0.0
+cryptography>=44.0.0fakeredis==2.26.2
