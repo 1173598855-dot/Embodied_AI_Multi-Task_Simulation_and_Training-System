@@ -40,7 +40,7 @@ docker-compose down
 
 ### 访问地址
 
-- 前端：http://localhost:18080
+- 前端：http://localhost:18081
 - 后端：http://localhost:18000
 - API 文档：http://localhost:18000/docs
 - MySQL：localhost:13306
